@@ -18,6 +18,10 @@ case class ConflictException(message: String) extends AppException(message) {
   override def httpStatus: HttpStatus = HttpStatus.CONFLICT
 }
 
+case class UnauthorizedException(message: String) extends AppException(message) {
+  override def httpStatus: HttpStatus = HttpStatus.UNAUTHORIZED
+}
+
 case class UnprocessableEntityException(message: String) extends AppException(message) {
   override def httpStatus: HttpStatus = HttpStatus.UNPROCESSABLE_ENTITY
 }

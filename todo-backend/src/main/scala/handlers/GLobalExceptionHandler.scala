@@ -1,18 +1,16 @@
 package handlers
 
+import com.greenfossil.commons.json.Json
 import com.linecorp.armeria.common.{HttpRequest, HttpResponse, HttpStatus, MediaType}
 import com.linecorp.armeria.server.{HttpService, ServiceRequestContext, SimpleDecoratingHttpService}
-import com.fasterxml.jackson.databind.ObjectMapper
 import exceptions.AppException
 import scala.util.control.NonFatal
 
 class GlobalExceptionHandler(delegate: HttpService) extends SimpleDecoratingHttpService(delegate) {
-  private val objectMapper = new ObjectMapper()
 
   override def serve(ctx: ServiceRequestContext, req: HttpRequest): HttpResponse = {
     try {
       val response = delegate.serve(ctx, req)
-      // Wrap the response to handle exceptions from async operations
       response.recover {
         case ex: AppException =>
           createErrorResponse(ex.httpStatus, getErrorName(ex), ex.getMessage)
@@ -40,21 +38,20 @@ class GlobalExceptionHandler(delegate: HttpService) extends SimpleDecoratingHttp
       case _: exceptions.NotFoundException => "NOT_FOUND"
       case _: exceptions.BadRequestException => "BAD_REQUEST"
       case _: exceptions.ConflictException => "CONFLICT"
+      case _: exceptions.UnauthorizedException => "UNAUTHORIZED"
       case _: exceptions.UnprocessableEntityException => "UNPROCESSABLE_ENTITY"
     }
   }
 
   private def createErrorResponse(status: HttpStatus, errorType: String, message: String): HttpResponse = {
-    val errorResponse = ErrorResponse(
-      error = errorType,
-      message = message,
-      timestamp = System.currentTimeMillis()
+    val json = Json.obj(
+      "error" -> errorType,
+      "message" -> message,
+      "timestamp" -> System.currentTimeMillis()
     )
-
-    val json = objectMapper.writeValueAsString(errorResponse)
     HttpResponse.builder()
       .status(status)
-      .content(MediaType.JSON, json)
+      .content(MediaType.JSON, json.stringify)
       .build()
   }
 }
