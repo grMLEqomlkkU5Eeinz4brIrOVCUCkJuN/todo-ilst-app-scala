@@ -1,4 +1,4 @@
-I woulazy val root = project
+lazy val root = project
   .in(file("."))
   .settings(
     name := "todo-backend",
