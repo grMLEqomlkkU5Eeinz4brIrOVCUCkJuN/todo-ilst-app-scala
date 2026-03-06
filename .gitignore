@@ -1,1 +1,5 @@
 Internal
+
+# these got added when using the github actions extensions since I opened it in VSCode
+.metals
+.vscode
