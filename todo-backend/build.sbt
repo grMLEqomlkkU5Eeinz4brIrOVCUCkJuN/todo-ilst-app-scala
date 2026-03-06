@@ -6,6 +6,12 @@ I woulazy val root = project
     scalaVersion := "3.7.1",
   )
 
+assembly / assemblyMergeStrategy := {
+  case PathList("module-info.class")     => MergeStrategy.discard
+  case PathList("META-INF", _ @_*)       => MergeStrategy.discard
+  case x                                 => (assembly / assemblyMergeStrategy).value(x)
+}
+
 libraryDependencies ++= Seq(
   "com.greenfossil" %% "thorium" % "0.10.0" withSources(),
   "com.greenfossil" %% "commons-json" % "1.3.2",
