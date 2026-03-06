@@ -19,9 +19,9 @@ import com.typesafe.config.ConfigFactory
         try config.getStringList("cors.allowedOrigins").asScala.toSeq
         catch case _: Exception => config.getString("cors.allowedOrigins").split(",").map(_.trim).toSeq
       val methods =
-        try config.getStringList("cors.allowedMethods").asScala.toSeq
-        catch case _: Exception => config.getString("cors.allowedMethods").split(",").map(_.trim).toSeq
-        map (m => HttpMethod.valueOf(m))
+        (try config.getStringList("cors.allowedMethods").asScala.toSeq
+        catch case _: Exception => config.getString("cors.allowedMethods").split(",").map(_.trim).toSeq)
+          .map(m => HttpMethod.valueOf(m))
       val allowedHeaders: Seq[CharSequence] =
         try config.getStringList("cors.allowedHeaders").asScala.toSeq
         catch case _: Exception => config.getString("cors.allowedHeaders").split(",").map(_.trim).toSeq
