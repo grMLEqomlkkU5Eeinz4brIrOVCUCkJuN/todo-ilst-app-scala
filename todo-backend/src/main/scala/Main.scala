@@ -15,10 +15,19 @@ import com.typesafe.config.ConfigFactory
     .serverBuilderSetup { sb =>
       import scala.jdk.CollectionConverters.*
 
-      val origins = config.getStringList("cors.allowedOrigins").asScala.toSeq
-      val methods = config.getStringList("cors.allowedMethods").asScala.toSeq.map(m => HttpMethod.valueOf(m))
-      val allowedHeaders: Seq[CharSequence] = config.getStringList("cors.allowedHeaders").asScala.toSeq
-      val exposedHeaders: Seq[CharSequence] = config.getStringList("cors.exposedHeaders").asScala.toSeq
+      val origins =
+        try config.getStringList("cors.allowedOrigins").asScala.toSeq
+        catch case _: Exception => config.getString("cors.allowedOrigins").split(",").map(_.trim).toSeq
+      val methods =
+        try config.getStringList("cors.allowedMethods").asScala.toSeq
+        catch case _: Exception => config.getString("cors.allowedMethods").split(",").map(_.trim).toSeq
+        map (m => HttpMethod.valueOf(m))
+      val allowedHeaders: Seq[CharSequence] =
+        try config.getStringList("cors.allowedHeaders").asScala.toSeq
+        catch case _: Exception => config.getString("cors.allowedHeaders").split(",").map(_.trim).toSeq
+      val exposedHeaders: Seq[CharSequence] =
+        try config.getStringList("cors.exposedHeaders").asScala.toSeq
+        catch case _: Exception => config.getString("cors.exposedHeaders").split(",").map(_.trim).toSeq
       val allowCredentials = config.getBoolean("cors.allowCredentials")
       val maxAge = config.getLong("cors.maxAge")
 
